@@ -20,6 +20,10 @@
   <div class="container mt-5">
     <h2>ファイルアップロード</h2>
     <input type="file" class="filepond" name="filepond" multiple>
+    <div class="mt-4">
+      <label for="scaleRange" class="form-label">Model Scale</label>
+      <input type="range" class="form-range" min="0.1" max="2" step="0.1" id="scaleRange">
+    </div>
     <div id="preview"></div>
   </div>
 
@@ -27,7 +31,6 @@
   <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
   <script
     src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-
   <script
     src="https://cdn.jsdelivr.net/npm/filepond-plugin-file-validate-type@1.2.9/dist/filepond-plugin-file-validate-type.min.js"></script>
 
@@ -38,7 +41,7 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/"
       }
     }
-    </script>
+  </script>
 
   <script type="module">
     import * as THREE from 'three';
@@ -68,24 +71,17 @@
     light.position.set(0, 200, 0);
     scene.add(light);
 
-    // カメラコントローラーを作成
+    // Camera controls
     const controls = new OrbitControls(camera, renderer.domElement);
 
     const loader = new GLTFLoader();
-
     camera.position.z = 5;
 
     let model = null;
 
+    // Function to animate the scene
     function animate() {
       requestAnimationFrame(animate);
-
-      // モデルのスケールを動的に変更（例：時間に応じてスケールアップ）
-      if (model) {
-        const scale = Math.abs(Math.sin(Date.now() * 0.001)) + 0.5; // 0.5〜1.5の範囲でスケール変更
-        model.scale.set(scale, scale, scale);
-      }
-
       renderer.render(scene, camera);
     }
     animate();
@@ -106,6 +102,12 @@
         scene.add(model);
       });
       reader.readAsArrayBuffer(file.file);
+    };
+
+    // Handle scale change
+    document.getElementById('scaleRange').oninput = event => {
+      const scale = event.target.value;
+      model && model.scale.set(scale, scale, scale);
     };
   </script>
 </body>
