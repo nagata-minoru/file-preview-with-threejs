@@ -91,7 +91,7 @@
     animate();
 
     // Handle file added event
-    pond.on('addfile', (error, file) => {
+    pond.onaddfile = (error, file) => {
       if (error) {
         console.error(error);
         return;
@@ -106,7 +106,7 @@
         scene.add(model);
       });
       reader.readAsArrayBuffer(file.file);
-    });
+    };
   </script>
 </body>
 
