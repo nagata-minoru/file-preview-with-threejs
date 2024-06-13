@@ -27,10 +27,24 @@
   <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
   <script
     src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/filepond-plugin-file-validate-type@1.2.9/dist/filepond-plugin-file-validate-type.min.js"></script>
-  <script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/filepond-plugin-file-validate-type@1.2.9/dist/filepond-plugin-file-validate-type.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/"
+      }
+    }
+    </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
     // Register plugins
     FilePond.registerPlugin(FilePondPluginFileValidateType);
 
@@ -49,11 +63,14 @@
     renderer.setSize(600, 400);
     document.getElementById('preview').appendChild(renderer.domElement);
 
-    const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+    const light = new THREE.HemisphereLight(0xffffff, 0x444444, 3);
     light.position.set(0, 200, 0);
     scene.add(light);
 
-    const loader = new THREE.GLTFLoader();
+    // カメラコントローラーを作成
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    const loader = new GLTFLoader();
 
     camera.position.z = 5;
 
@@ -70,22 +87,11 @@
         return;
       }
 
-      // Clear previous scene
-      while (scene.children.length > 0) {
-        scene.remove(scene.children[0]);
-      }
+      while (scene.children.length > 1) scene.remove(scene.children[1]); // Clear previous models from the scene
 
       // Read the file and load it with GLTFLoader
       const reader = new FileReader();
-      reader.onload = function (event) {
-        debugger;
-        const arrayBuffer = event.target.result;
-        loader.parse(arrayBuffer, '', (gltf) => {
-          scene.add(gltf.scene);
-        },
-        error => console.log(error)
-      );
-      };
+      reader.onload = event => loader.parse(event.target.result, '', gltf => scene.add(gltf.scene));
       reader.readAsArrayBuffer(file.file);
     });
   </script>
