@@ -75,8 +75,17 @@
 
     camera.position.z = 5;
 
+    let model = null;
+
     function animate() {
       requestAnimationFrame(animate);
+
+      // モデルのスケールを動的に変更（例：時間に応じてスケールアップ）
+      if (model) {
+        const scale = Math.abs(Math.sin(Date.now() * 0.001)) + 0.5; // 0.5〜1.5の範囲でスケール変更
+        model.scale.set(scale, scale, scale);
+      }
+
       renderer.render(scene, camera);
     }
     animate();
@@ -92,7 +101,10 @@
 
       // Read the file and load it with GLTFLoader
       const reader = new FileReader();
-      reader.onload = event => loader.parse(event.target.result, '', gltf => scene.add(gltf.scene));
+      reader.onload = event => loader.parse(event.target.result, '', gltf => {
+        model = gltf.scene;
+        scene.add(model);
+      });
       reader.readAsArrayBuffer(file.file);
     });
   </script>
